@@ -183,75 +183,64 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('registerForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const btnLoading = document.getElementById('btnLoading');
+        <!-- внутри <script> -->
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoading = document.getElementById('btnLoading');
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-                // Сброс ошибок
-                document.querySelectorAll('.error-message').forEach(el => {
-                    el.textContent = '';
-                    el.style.display = 'none';
-                });
-
-                // Валидация паролей (только она осталась)
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-
-                if (password !== confirmPassword) {
-                    showError('confirm-password-error', 'Пароли не совпадают');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    showError('password-error', 'Пароль должен содержать минимум 6 символов');
-                    return;
-                }
-
-                // Блокируем кнопку и показываем загрузку
-                submitBtn.disabled = true;
-                btnText.textContent = 'Отправка...';
-                btnLoading.style.display = 'inline-block';
-
-                try {
-                    const formData = new FormData(form);
-                    const response = await fetch('registerBack.php', {
-                        method: 'POST',
-                        body: formData,
-                    });
-                    const result = await response.json();
-
-                    if (result.status === 'success') {
-                        alert('Регистрация прошла успешно!');
-                        window.location.href = 'signIn.html';
-                    } else {
-                        if (result.field) {
-                            showError(`${result.field}-error`, result.message);
-                        } else {
-                            alert(result.message);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Произошла ошибка при отправке формы');
-                } finally {
-                    submitBtn.disabled = false;
-                    btnText.textContent = 'Зарегистрироваться';
-                    btnLoading.style.display = 'none';
-                }
-            });
-
-            function showError(elementId, message) {
-                const errorElement = document.getElementById(elementId);
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        // Сброс сообщений
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.textContent = '';
+            el.style.display = 'none';
         });
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (password !== confirmPassword) {
+            showError('confirm-password-error', 'Пароли не совпадают');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        btnText.textContent = 'Отправка...';
+        btnLoading.style.display = 'inline-block';
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('registerBack.php', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                alert('Регистрация прошла успешно!');
+                window.location.href = 'signIn.html';
+            } else {
+                alert(result.message); // показываем сообщение из триггера
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка при отправке формы');
+        } finally {
+            submitBtn.disabled = false;
+            btnText.textContent = 'Зарегистрироваться';
+            btnLoading.style.display = 'none';
+        }
+    });
+
+    function showError(id, message) {
+        const el = document.getElementById(id);
+        el.textContent = message;
+        el.style.display = 'block';
+    }
+});
     </script>
 </body>
 </html>

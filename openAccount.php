@@ -1,5 +1,5 @@
 <?php
-// Настройки сессии ДО session_start()
+// Настройки сессии
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 0);
 ini_set('session.cookie_samesite', 'Lax');
@@ -13,7 +13,11 @@ header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Проверка аутентификации
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
+
+// Проверка авторизации
 if (!isset($_SESSION['user']) || !$_SESSION['user']['authenticated']) {
     http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Необходима авторизация']);
@@ -22,7 +26,7 @@ if (!isset($_SESSION['user']) || !$_SESSION['user']['authenticated']) {
 
 $user_id = $_SESSION['user']['id'];
 
-// Конфигурация базы данных
+// Конфигурация подключения к БД
 $config = [
     'host' => 'localhost',
     'dbname' => 'bank_website',
@@ -47,19 +51,16 @@ try {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit;
-}
-
+// Обработка POST-запроса
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
-    
+
     if (json_last_error() !== JSON_ERROR_NONE) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Неверный формат данных']);
         exit;
     }
-    
+
     $requiredFields = ['currency', 'accountType'];
     foreach ($requiredFields as $field) {
         if (empty($input[$field])) {
@@ -68,71 +69,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-    
+
     $allowedCurrencies = ['RUB', 'USD', 'EUR'];
     if (!in_array($input['currency'], $allowedCurrencies)) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Указана недопустимая валюта']);
         exit;
     }
-    
+
     try {
         $pdo->beginTransaction();
-        
+
+        // Вставка счета — триггер проверит возраст и количество
         $stmt = $pdo->prepare("
-            INSERT INTO BankAccount (user_id, balance, currency, account_status) 
+            INSERT INTO BankAccount (user_id, balance, currency, account_status)
             VALUES (?, 0.00, ?, ?)
         ");
-        
-        $stmt->execute([
-            $user_id,
-            $input['currency'],
-            $input['accountType']
-        ]);
-        
+        $stmt->execute([$user_id, $input['currency'], $input['accountType']]);
+
         $accountId = $pdo->lastInsertId();
-        
         $accountNumber = generateAccountNumber($input['currency']);
-        
+
+        // Проценты — только для сберегательного счета
+        $interest = null;
+        if ($input['accountType'] === 'savings') {
+            $principal = 0;
+            $annualRate = 5.0;
+            $months = 12;
+
+            $stmt = $pdo->prepare("
+                SELECT calculate_interest(?, ?, ?, TRUE) AS interest
+            ");
+            $stmt->execute([$principal, $annualRate, $months]);
+            $interest = $stmt->fetch()['interest'];
+
+            $stmt = $pdo->prepare("
+                INSERT INTO AccountInterest (account_id, interest_amount)
+                VALUES (?, ?)
+            ");
+            $stmt->execute([$accountId, $interest]);
+        }
+
         $pdo->commit();
-        
+
         echo json_encode([
             'status' => 'success',
             'message' => 'Счет успешно создан',
             'accountId' => $accountId,
             'accountNumber' => $accountNumber,
             'currency' => $input['currency'],
-            'accountType' => $input['accountType']
+            'accountType' => $input['accountType'],
+            'interest' => $interest
         ]);
-        
+
     } catch (PDOException $e) {
         $pdo->rollBack();
-        error_log("Account creation error: " . $e->getMessage());
-        
-        $message = 'Ошибка при создании счета';
-        if (strpos($e->getMessage(), 'Для создания счета пользователь должен быть старше 18 лет') !== false) {
-            $message = 'Для создания счета вам должно быть 18 лет или больше';
-        } elseif (strpos($e->getMessage(), 'Пользователь может иметь не более 5 счетов') !== false) {
-            $message = 'Вы достигли максимального количества счетов (5)';
-        }
-        
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => $message]);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
 } else {
     http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Метод не поддерживается']);
 }
 
+// Генератор номера счета
 function generateAccountNumber($currency) {
-    $prefix = '';
-    switch ($currency) {
-        case 'RUB': $prefix = '810'; break;
-        case 'USD': $prefix = '840'; break;
-        case 'EUR': $prefix = '978'; break;
-        default: $prefix = '000';
-    }
-    
+    $prefix = match($currency) {
+        'RUB' => '810',
+        'USD' => '840',
+        'EUR' => '978',
+        default => '000',
+    };
     $randomPart = mt_rand(1000000000, 9999999999);
     return $prefix . $randomPart;
 }

@@ -114,56 +114,58 @@
     </main>
 
     <script>
-    document.getElementById("createAccountForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const messageDiv = document.getElementById("responseMessage");
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Создание...";
-    messageDiv.className = "hidden";
-    
-    try {
-        const formData = {
-            currency: document.getElementById("currency").value,
-            accountType: document.getElementById("accountType").value
-        };
-        
-        const response = await fetch('openAccount.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData),
-            credentials: 'include'
+        document.getElementById("createAccountForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById("responseMessage");
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Создание...";
+            messageDiv.className = "hidden";
+            
+            try {
+                const formData = {
+                    currency: document.getElementById("currency").value,
+                    accountType: document.getElementById("accountType").value
+                };
+                
+                const response = await fetch('openAccount.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Ошибка сервера');
+                }
+                
+                // NEW: Показываем проценты для сберегательного счета
+                let message = `Счет №${result.accountNumber} (${result.currency}, ${result.accountType}) создан!`;
+                if (result.accountType === 'savings' && result.interest !== null) {
+                    message += `<br>Примерный доход за год: ${result.interest} ${result.currency}`;
+                }
+                
+                messageDiv.innerHTML = message;
+                messageDiv.className = "success";
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 3000);
+                
+            } catch (error) {
+                messageDiv.textContent = error.message;
+                messageDiv.className = "error";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Создать счет";
+            }
         });
-        
-        const result = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(result.message || 'Ошибка сервера');
-        }
-        
-        // Успешное создание счета
-        messageDiv.textContent = `Счет №${result.accountNumber} (${result.currency}, ${result.accountType}) успешно создан! Перенаправляем...`;
-        messageDiv.className = "success";
-        
-        // Перенаправление через 3 секунды
-        setTimeout(() => {
-            window.location.href = '/dashboard';
-        }, 3000);
-        
-    } catch (error) {
-        messageDiv.textContent = error.message;
-        messageDiv.className = "error";
-        console.error('Error:', error);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Создать счет";
-        messageDiv.classList.remove("hidden");
-    }
-});
     </script>
 </body>
 </html>

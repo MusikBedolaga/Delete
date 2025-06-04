@@ -28,7 +28,6 @@ try {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Обработка данных формы
     $data = [
         'full_name' => trim($_POST['full_name'] ?? ''),
         'email' => trim($_POST['email'] ?? ''),
@@ -38,42 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'birthdate' => $_POST['birthdate'] ?? ''
     ];
 
-    // Валидация данных
-    if (empty($data['full_name'])) {
-        echo json_encode([
-            'status' => 'error',
-            'field' => 'full_name',
-            'message' => 'Введите ФИО'
-        ]);
-        exit;
-    }
-
-    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        echo json_encode([
-            'status' => 'error',
-            'field' => 'email',
-            'message' => 'Введите корректный email'
-        ]);
-        exit;
-    }
-
-    if (strlen($data['password']) < 6) {
-        echo json_encode([
-            'status' => 'error',
-            'field' => 'password',
-            'message' => 'Пароль должен содержать минимум 6 символов'
-        ]);
-        exit;
-    }
-
-    // Проверка возраста (18+)
-    $birthdate = new DateTime($data['birthdate']);
-    $today = new DateTime();
-    $age = $today->diff($birthdate)->y;
-    
-
-    // Проверка существующего пользователя
     try {
+        // Проверка существующего пользователя
         $stmt = $pdo->prepare("
             SELECT id FROM User 
             WHERE email = :email OR inn = :inn OR passport_number = :passport
@@ -105,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Хеширование пароля
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
-        // Создание пользователя
+        // Попытка вставки пользователя — валидация будет через триггер
         $stmt = $pdo->prepare("
             INSERT INTO User (
                 full_name, email, password_hash, 
@@ -115,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 :passport, :inn, :birthdate, :role_id
             )
         ");
-        
+
         $stmt->execute([
             'full_name' => $data['full_name'],
             'email' => $data['email'],
@@ -132,10 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
     } catch (PDOException $e) {
-        error_log("Database error: " . $e->getMessage());
+        // Обработка ошибок из триггера
         echo json_encode([
             'status' => 'error',
-            'message' => 'Произошла ошибка при регистрации'
+            'message' => $e->getMessage() // сообщение из триггера попадет сюда
         ]);
     }
 } else {
@@ -144,4 +109,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'message' => 'Метод не поддерживается'
     ]);
 }
-?>
