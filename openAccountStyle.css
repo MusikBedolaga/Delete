@@ -1,0 +1,84 @@
+/* Общие стили для страницы */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e9ecef;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #007bff;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+main {
+  max-width: 600px; /* Ограничиваем ширину формы */
+  margin: 20px auto; /* Центрируем форму на странице */
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+  margin: 0;
+  text-align: center;
+}
+
+.account-form {
+  margin: 0 auto;
+}
+
+/* Стили для меток и полей ввода */
+.account-form label {
+  display: block; /* Метки отображаются как блочные элементы */
+  margin: 15px 0 5px; /* Отступы для меток */
+  color: #555;
+}
+
+.account-form input {
+  width: 100%; /* Поля занимают всю ширину формы */
+  padding: 12px; /* Внутренние отступы */
+  margin-bottom: 15px; /* Отступ внизу */
+  border: 1px solid #ced4da; /* Цвет границы полей */
+  border-radius: 5px; /* Скругляем углы */
+  transition: border 0.3s; /* Плавный переход для границы */
+}
+
+.account-form input:focus {
+  border-color: #007bff; /* Цвет границы при фокусе */
+  outline: none; /* Убираем стандартное обрамление */
+}
+
+/* Стили для кнопки */
+.account-form button {
+  width: 100%; /* Кнопка занимает всю ширину формы */
+  padding: 12px; /* Внутренние отступы */
+  background-color: #007bff; /* Цвет фона кнопки */
+  color: white; /* Цвет текста кнопки */
+  border: none; /* Убираем рамку */
+  border-radius: 5px; /* Скругляем углы */
+  cursor: pointer; /* Курсор указывает, что можно кликнуть */
+  font-size: 16px; /* Размер шрифта */
+  transition: background-color 0.3s; /* Плавный переход для фона кнопки */
+}
+
+.account-form button:hover {
+  background-color: #0056b3; /* Тёмный цвет при наведении */
+}
+
+/* Стили для футера */
+footer {
+  margin-top: 20px; /* Отступ сверху */
+  padding: 20px; /* Внутренние отступы */
+  text-align: center; /* Выравнивание текста по центру */
+  background-color: #f1f1f1; /* Цвет фона футера */
+  border-top: 1px solid #ccc; /* Вертикальная линия сверху */
+}
+
+footer p {
+  margin: 5px 0; /* Отступы для параграфов */
+  color: #555; /* Цвет текста */
+}

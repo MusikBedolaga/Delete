@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Получить консультацию</title>
+    <link rel="stylesheet" href="getConsultationStyle.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Получить консультацию</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="about">
+            <h2>О консультации</h2>
+            <p>Получите профессиональную консультацию по всем вопросам, касающимся управления вашими финансами, кредитованием и услугами нашего банка. Наша команда экспертов готова помочь вам разобраться в ваших потребностях и предложить наилучшие решения.</p>
+        </section>
+
+        <section id="form">
+            <h2>Форма заявки на консультацию</h2>
+            <form action="#" method="POST">
+                <label for="name">Ваше имя:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Ваш Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="phone">Ваш телефон:</label>
+                <input type="tel" id="phone" name="phone" required>
+
+                <label for="question">Ваш вопрос:</label>
+                <textarea id="question" name="question" rows="4" required></textarea>
+
+                <button id = "push" type="submit">Отправить заявку</button>
+            </form>
+        </section>
+
+        <section id="contact">
+            <h2>Контактная информация</h2>
+            <p>Если у вас есть дополнительные вопросы, вы можете обратиться к нашей службе поддержки по телефону: <strong>(123) 456-7890</strong> или написать на email: <strong>support@bank.com</strong>.</p>
+        </section>
+
+        <script>
+          document.getElementById("push").addEventListener("click", function(event) {
+            event.preventDefault()
+
+            document.location.href = "index.html"
+            alert("Вы успешно записались на консультацию. Мы позвоним вам в скором времени")
+          });
+        </script>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Ваш Банк. Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>

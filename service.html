@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+          <a href="index.html">
+            <img src="logoBank.png" alt="Логотип банка">
+          </a>
+        </div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="profile.html">Личный кабинет</a></li>
+                <li><a href="service.html">Услуги</a></li>
+                <li><a href="#">Онлайн-банкинг</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+            </ul>
+        </nav>
+        <div class="buttons">
+            <button class="btn">Открыть счет</button>
+            <button class="btn">Получить консультацию</button>
+        </div>
+    </header>
+
+    <div class="body-content">
+        <div class="label" style="margin-top: 120px;"">
+            <h2>Онлайн-Банк Зарифянова Мусы</h2>
+            <p class="credit-note">Возьми кредит и расплачивайся всю жизнь</p>
+        </div>
+
+        <div class="services-overview">
+            <h3>Краткий обзор услуг</h3>
+
+            <div class="service">
+                <h4>Кредиты</h4>
+                <p>Надежные кредиты для ваших нужд. Ищете средства на покупку автомобиля, жилья или вы должны крупную сумму казино? Наши кредиты имеют гибкие условия и конкурентные процентные ставки, чтобы помочь вам реализовать ваши планы.</p>
+                <button class="btn service-button" onclick="toggleForm('creditForm')">Оформить кредит</button>
+                <div id="creditForm" class="service-form">
+                    <form action="#" method="post">
+                        <label for="creditName">Ваше имя:</label>
+                        <input type="text" id="creditName" name="name" required>
+
+                        <label for="creditEmail">Электронная почта:</label>
+                        <input type="email" id="creditEmail" name="email" required>
+
+                        <label for="creditAmount">Сумма кредита:</label>
+                        <input type="number" id="creditAmount" name="amount" required>
+
+                        <button type="submit">Подать заявку</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="service">
+                <h4>Депозиты</h4>
+                <p>Накопления на вашем счете. Присоединяйтесь к нашей депозитной программе и получите гарантированный доход на ваши сбережения с выгодными процентными ставками.</p>
+                <button class="btn service-button" onclick="toggleForm('depositForm')">Оформить депозит</button>
+                <div id="depositForm" class="service-form">
+                    <form action="#" method="post">
+                        <label for="depositName">Ваше имя:</label>
+                        <input type="text" id="depositName" name="name" required>
+
+                        <label for="depositEmail">Электронная почта:</label>
+                        <input type="email" id="depositEmail" name="email" required>
+
+                        <label for="depositAmount">Сумма депозита:</label>
+                        <input type="number" id="depositAmount" name="amount" required>
+
+                        <button type="submit">Подать заявку</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="service">
+                <h4>Иппотека</h4>
+                <p>Ваша родная бабушка переписала свою квартиру на какого-то дальнего родственика? Не вопрос, вы также можете оформить у нас иппотеку!</p>
+                <button class="btn service-button" onclick="toggleForm('depositForm')">Оформить иппотеку</button>
+                <div id="depositForm" class="service-form">
+                    <form action="#" method="post">
+                        <label for="depositName">Ваше имя:</label>
+                        <input type="text" id="depositName" name="name" required>
+
+                        <label for="depositEmail">Электронная почта:</label>
+                        <input type="email" id="depositEmail" name="email" required>
+
+                        <label for="depositAmount">Сумма депозита:</label>
+                        <input type="number" id="depositAmount" name="amount" required>
+
+                        <button type="submit">Подать заявку</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="service">
+                <h4>Кредитные карты</h4>
+                <p>Теже самые кредиты, только в онлайн формате и с более ужасными процентами.</p>
+                <button class="btn service-button" onclick="toggleForm('depositForm')">Оформить кредитную карту</button>
+                <div id="depositForm" class="service-form">
+                    <form action="#" method="post">
+                        <label for="depositName">Ваше имя:</label>
+                        <input type="text" id="depositName" name="name" required>
+
+                        <label for="depositEmail">Электронная почта:</label>
+                        <input type="email" id="depositEmail" name="email" required>
+
+                        <label for="depositAmount">Сумма депозита:</label>
+                        <input type="number" id="depositAmount" name="amount" required>
+
+                        <button type="submit">Подать заявку</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="contacts-section">
+            <h3>Контакты</h3>
+
+            <div class="contact-info">
+                <h4>Наши контактные данные</h4>
+                <p><strong>Адрес:</strong> ул. Нескамерская, дом 1, офис 100, г. Казань, 101000</p>
+                <p><strong>Телефон:</strong> +7 (495) 123-45-67</p>
+                <p><strong>Электронная почта:</strong> nescamm@bank-example.ru</p>
+            </div>
+        </div>
+    </div>
+</body>
+       

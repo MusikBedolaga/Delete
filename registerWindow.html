@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Регистрация в банке</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --error: #dc2626;
+            --success: #16a34a;
+            --gray: #6b7280;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+        .checkbox input {
+            width: auto;
+            margin-right: 0.75rem;
+        }
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.875rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+        }
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация</h1>
+        <form id="registerForm" novalidate>
+            <div class="form-group">
+                <label for="full_name">ФИО:</label>
+                <input type="text" id="full_name" name="full_name" required />
+                <div id="full_name-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+                <div id="email-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required minlength="6" />
+                <div id="password-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Подтверждение пароля:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required />
+                <div id="confirm-password-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="passport">Номер паспорта (10 цифр):</label>
+                <input type="text" id="passport" name="passport" required />
+                <div id="passport-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="inn">ИНН (12 цифр):</label>
+                <input type="text" id="inn" name="inn" required />
+                <div id="inn-error" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="birthdate">Дата рождения:</label>
+                <input type="date" id="birthdate" name="birthdate" required />
+                <div id="birthdate-error" class="error-message"></div>
+            </div>
+
+            <div class="checkbox">
+                <input type="checkbox" id="agree" name="agree" required />
+                <label for="agree">Я согласен с <a href="#" style="color: var(--primary);">условиями использования</a></label>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span id="btnText">Зарегистрироваться</span>
+                <span id="btnLoading" class="loading" style="display: none;"></span>
+            </button>
+        </form>
+
+        <div class="login-link">
+            <p>Уже зарегистрированы? <a href="signIn.html">Войти</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('registerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Сброс ошибок
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.textContent = '';
+                    el.style.display = 'none';
+                });
+
+                // Валидация паролей (только она осталась)
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (password !== confirmPassword) {
+                    showError('confirm-password-error', 'Пароли не совпадают');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showError('password-error', 'Пароль должен содержать минимум 6 символов');
+                    return;
+                }
+
+                // Блокируем кнопку и показываем загрузку
+                submitBtn.disabled = true;
+                btnText.textContent = 'Отправка...';
+                btnLoading.style.display = 'inline-block';
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch('registerBack.php', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        alert('Регистрация прошла успешно!');
+                        window.location.href = 'signIn.html';
+                    } else {
+                        if (result.field) {
+                            showError(`${result.field}-error`, result.message);
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при отправке формы');
+                } finally {
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'Зарегистрироваться';
+                    btnLoading.style.display = 'none';
+                }
+            });
+
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body>
+</html>

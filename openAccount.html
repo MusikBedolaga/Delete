@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Открытие нового счета - Банк</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+        main {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        select, button {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 0.75rem;
+        }
+        button:hover {
+            background-color: #1a252f;
+        }
+        .hidden {
+            display: none;
+        }
+        .success {
+            color: green;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #e8f5e9;
+        }
+        .error {
+            color: red;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #ffebee;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Открытие нового банковского счета</h1>
+        <nav>
+            <a href="/dashboard">Личный кабинет</a>
+            <a href="/logout">Выйти</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="account-creation-container">
+            <h2>Открыть новый счет</h2>
+            
+            <form id="createAccountForm">
+                <div class="form-group">
+                    <label for="currency">Валюта счета:</label>
+                    <select id="currency" name="currency" required>
+                        <option value="RUB">Рубли (RUB)</option>
+                        <option value="USD">Доллары (USD)</option>
+                        <option value="EUR">Евро (EUR)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountType">Тип счета:</label>
+                    <select id="accountType" name="accountType" required>
+                        <option value="current">Текущий счет</option>
+                        <option value="savings">Сберегательный счет</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">Создать счет</button>
+            </form>
+            
+            <div id="responseMessage" class="hidden"></div>
+        </div>
+    </main>
+
+    <script>
+    document.getElementById("createAccountForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const messageDiv = document.getElementById("responseMessage");
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Создание...";
+    messageDiv.className = "hidden";
+    
+    try {
+        const formData = {
+            currency: document.getElementById("currency").value,
+            accountType: document.getElementById("accountType").value
+        };
+        
+        const response = await fetch('openAccount.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData),
+            credentials: 'include'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Ошибка сервера');
+        }
+        
+        // Успешное создание счета
+        messageDiv.textContent = `Счет №${result.accountNumber} (${result.currency}, ${result.accountType}) успешно создан! Перенаправляем...`;
+        messageDiv.className = "success";
+        
+        // Перенаправление через 3 секунды
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 3000);
+        
+    } catch (error) {
+        messageDiv.textContent = error.message;
+        messageDiv.className = "error";
+        console.error('Error:', error);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Создать счет";
+        messageDiv.classList.remove("hidden");
+    }
+});
+    </script>
+</body>
+</html>

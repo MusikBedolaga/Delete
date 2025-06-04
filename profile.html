@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль клиента</title>
+    <link rel="stylesheet" href="headerStyles.css">
+    <style>
+        .transactions {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .transactions th, .transactions td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .transactions th {
+            background-color: #f2f2f2;
+        }
+        
+        .transactions tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .transactions tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .transaction-type {
+            font-weight: bold;
+        }
+        
+        .income {
+            color: green;
+        }
+        
+        .expense {
+            color: red;
+        }
+        
+        .error-message {
+            color: red;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .success-message {
+            color: green;
+            text-align: center;
+            margin: 20px;
+            font-weight: bold;
+        }
+
+        #editForm {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+
+        #editForm input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #editForm div {
+            margin-bottom: 15px;
+        }
+
+        #editForm label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <img src="logoBank.png" alt="Логотип банка">
+            </a>
+        </div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="profile.php">Личный кабинет</a></li>
+                <li><a href="service.html">Услуги</a></li>
+                <li><a href="#">Онлайн-банкинг</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+            </ul>
+        </nav>
+        <div class="buttons">
+            <button class="btn">Открыть счет</button>
+            <button class="btn">Получить консультацию</button>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <h2>Профиль клиента</h2>
+        
+        <div class="profile-info">
+            <h3>Личная информация</h3>
+            <p><strong>Имя:</strong> <span id="userName"></span></p>
+            <p><strong>Электронная почта:</strong> <span id="userEmail"></span></p>
+            <button class="btn" id="editButton">Редактировать информацию</button>
+            
+            <!-- Форма редактирования -->
+            <div id="editForm" style="display: none;">
+                <h4>Редактировать информацию</h4>
+                <div>
+                    <label for="editName">Имя:</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div>
+                    <label for="editEmail">Email:</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div>
+                    <button class="btn" id="saveButton" style="margin-right: 10px;">Сохранить</button>
+                    <button class="btn" id="cancelButton">Отменить</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="account-details">
+            <h3>Информация о счетах</h3>
+            <div id="accountsInfo"></div>
+            
+            <h4 style="margin-top: 20px;">История транзакций</h4>
+            <div id="transactionsInfo"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Банк. Все права не защищены. И это скам</p>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetch('profileBack.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                // Заполняем данные пользователя
+                document.getElementById('userName').textContent = result.user.full_name;
+                document.getElementById('userEmail').textContent = result.user.email;
+
+                // Заполняем информацию о счетах
+                const accountsInfo = document.getElementById('accountsInfo');
+                if (result.accounts && result.accounts.length > 0) {
+                    result.accounts.forEach(account => {
+                        const accountDiv = document.createElement('div');
+                        accountDiv.innerHTML = `
+                            <p><strong>Номер счета:</strong> ${account.id}</p>
+                            <p><strong>Баланс:</strong> ${account.balance} ${account.currency}</p>
+                            <hr>
+                        `;
+                        accountsInfo.appendChild(accountDiv);
+                    });
+                } else {
+                    accountsInfo.innerHTML = '<p>У вас пока нет открытых счетов</p>';
+                }
+
+                // Заполняем транзакции
+                const transactionsInfo = document.getElementById('transactionsInfo');
+                if (result.transactions && result.transactions.length > 0) {
+                    const table = document.createElement('table');
+                    table.className = 'transactions';
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Описание</th>
+                                <th>Сумма</th>
+                                <th>Тип</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody"></tbody>
+                    `;
+                    transactionsInfo.appendChild(table);
+
+                    const tbody = document.getElementById('transactionsBody');
+                    result.transactions.forEach(transaction => {
+                        const amountClass = (transaction.transaction_type === 'income' || transaction.amount > 0) ? 'income' : 'expense';
+                        const amountSign = (transaction.transaction_type === 'income' || transaction.amount > 0) ? '+' : '-';
+                        const formattedAmount = `${amountSign} ${Math.abs(transaction.amount)} ${transaction.currency}`;
+                        const transactionType = (transaction.transaction_type === 'income' || transaction.amount > 0) ? 'Доход' : 'Расход';
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${new Date(transaction.transaction_date).toLocaleString()}</td>
+                            <td>${transaction.description || 'Без описания'}</td>
+                            <td class="${amountClass}">${formattedAmount}</td>
+                            <td><span class="transaction-type ${amountClass}">${transactionType}</span></td>
+                            <td>${transaction.status}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    transactionsInfo.innerHTML = '<p>Нет данных о транзакциях</p>';
+                }
+
+            } else {
+                showError(result.message || "Ошибка загрузки данных");
+            }
+        } catch (error) {
+            console.error("Ошибка:", error);
+            showError("Произошла ошибка при загрузке данных");
+        }
+
+        // Обработчики для редактирования профиля
+        document.getElementById('editButton').addEventListener('click', showEditForm);
+    });
+
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        document.querySelector('.profile-container').prepend(errorDiv);
+    }
+
+    function showEditForm() {
+        // Заполняем форму текущими значениями
+        document.getElementById('editName').value = document.getElementById('userName').textContent;
+        document.getElementById('editEmail').value = document.getElementById('userEmail').textContent;
+        
+        // Показываем форму и скрываем кнопку редактирования
+        document.getElementById('editForm').style.display = 'block';
+        document.getElementById('editButton').style.display = 'none';
+        
+        // Добавляем обработчики для новых кнопок
+        document.getElementById('saveButton').addEventListener('click', saveChanges);
+        document.getElementById('cancelButton').addEventListener('click', cancelEdit);
+    }
+
+    async function saveChanges() {
+        const fullName = document.getElementById('editName').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        
+        // Простая валидация
+        if (!fullName || !email) {
+            alert('Пожалуйста, заполните все поля');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            alert('Пожалуйста, введите корректный email');
+            return;
+        }
+        
+        try {
+            // Отправляем данные на сервер
+            const response = await fetch('profileBack.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    full_name: fullName,
+                    email: email
+                }),
+                credentials: 'include'
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === "success") {
+                // Обновляем данные на странице
+                document.getElementById('userName').textContent = fullName;
+                document.getElementById('userEmail').textContent = email;
+                
+                // Закрываем форму
+                cancelEdit();
+                
+                // Показываем сообщение об успехе
+                showSuccessMessage('Данные успешно обновлены');
+            } else {
+                alert(result.message || 'Ошибка при обновлении данных');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при сохранении данных');
+        }
+    }
+
+    function cancelEdit() {
+        // Скрываем форму и показываем кнопку редактирования
+        document.getElementById('editForm').style.display = 'none';
+        document.getElementById('editButton').style.display = 'block';
+    }
+
+    function showSuccessMessage(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.textContent = message;
+        document.querySelector('.profile-container').prepend(successDiv);
+        
+        // Удаляем сообщение через 3 секунды
+        setTimeout(() => {
+            successDiv.remove();
+        }, 3000);
+    }
+    </script>
+</body>
+</html>

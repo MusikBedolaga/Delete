@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы о банке</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        #review-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 100px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .reviews-section {
+            margin-top: 30px;
+        }
+        .review {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .review:last-child {
+            border-bottom: none;
+        }
+        .review h3 {
+            margin: 0 0 5px 0;
+            color: #3498db;
+        }
+        .review small {
+            color: #777;
+            font-size: 0.9em;
+        }
+        .error-message {
+            color: red;
+            margin: 10px 0;
+        }
+        .success-message {
+            color: green;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Отзывы о банке</h1>
+        
+        <form id="review-form">
+            <h2>Оставить отзыв</h2>
+            
+            <label for="review-text">Ваш отзыв:</label>
+            <textarea id="review-text" required></textarea>
+
+            <button type="submit">Отправить отзыв</button>
+            <div id="form-message"></div>
+        </form>
+
+        <!-- Секция для отображения существующих отзывов -->
+        <div class="reviews-section">
+            <h2>Отзывы клиентов</h2>
+            <div id="reviews-list">
+                <!-- Отзывы будут загружаться здесь -->
+                <p>Загрузка отзывов...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Загрузка отзывов при загрузке страницы
+        loadReviews();
+        
+        // Обработка отправки формы
+        document.getElementById('review-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reviewText = document.getElementById('review-text').value.trim();
+            
+            if (!reviewText) {
+                showFormMessage('Пожалуйста, напишите отзыв', 'error');
+                return;
+            }
+            
+            submitReview(reviewText);
+        });
+    });
+    
+    function loadReviews() {
+        fetch('reviewsBack.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    displayReviews(data.reviews);
+                } else {
+                    showFormMessage('Ошибка загрузки отзывов', 'error');
+                    console.error('Ошибка:', data.message);
+                }
+            })
+            .catch(error => {
+                showFormMessage('Ошибка загрузки отзывов', 'error');
+                console.error('Ошибка:', error);
+            });
+    }
+    
+    function submitReview(reviewText) {
+        showFormMessage('Отправка отзыва...', 'info');
+        
+        fetch('reviewsBack.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                review_text: reviewText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Очищаем форму
+                document.getElementById('review-form').reset();
+                // Добавляем новый отзыв в список
+                addReview(data.review);
+                showFormMessage('Спасибо за ваш отзыв!', 'success');
+            } else {
+                showFormMessage('Ошибка: ' + (data.message || 'Не удалось отправить отзыв'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            showFormMessage('Произошла ошибка при отправке отзыва', 'error');
+        });
+    }
+    
+    function displayReviews(reviews) {
+        const reviewsList = document.getElementById('reviews-list');
+        reviewsList.innerHTML = '';
+        
+        if (reviews.length === 0) {
+            reviewsList.innerHTML = '<p>Пока нет отзывов. Будьте первым!</p>';
+            return;
+        }
+        
+        reviews.forEach(review => {
+            addReview(review, reviewsList);
+        });
+    }
+    
+    function addReview(review, container = null) {
+        if (!container) {
+            container = document.getElementById('reviews-list');
+        }
+        
+        const reviewElement = document.createElement('div');
+        reviewElement.className = 'review';
+        
+        const userName = review.user_name || 'Анонимный пользователь';
+        const date = new Date(review.created_at || new Date()).toLocaleString();
+        
+        reviewElement.innerHTML = `
+            <h3>${userName}</h3>
+            <p>${review.review_text}</p>
+            <small>Дата: ${date}</small>
+        `;
+        
+        // Добавляем новый отзыв в начало списка
+        container.prepend(reviewElement);
+    }
+    
+    function showFormMessage(message, type) {
+        const messageDiv = document.getElementById('form-message');
+        messageDiv.textContent = message;
+        messageDiv.className = type + '-message';
+    }
+    </script>
+</body>
+</html>

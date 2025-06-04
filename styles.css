@@ -1,0 +1,283 @@
+/* Основные настройки */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  position: fixed; /* Фиксируем заголовок */
+  top: 0;         /* На верхней части страницы */
+  left: 0;        /* Привязываем к левому краю */
+  width: 100%;    /* Занимает всю ширину */
+  background-color: #004080; /* Цвет фона заголовка */
+  color: white;
+  z-index: 1000;  /* Увеличиваем z-index, чтобы заголовок был выше содержимого */
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Настроки навигационной модели */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #004080;
+  color: white;
+}
+
+.logo img {
+  height: 75px;
+}
+
+.navbar ul {
+  display: flex;
+  list-style-type: none;
+}
+
+.navbar li {
+  margin: 0 15px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn:hover {
+  background-color: #e6b800;
+}
+
+.carousel {
+  height: 300px; /* высота карусели */
+}
+
+.carousel .carousel-inner {
+  height: 300px; /* высота внутреннего контейнера карусели */
+}
+
+.carousel .carousel-item {
+  height: 300px; /* высота каждого элемента карусели */
+}
+
+.carousel .carousel-item img {
+  height: 100%; /* Высота изображений карусели */
+  width: 100%; /* Ширина изображений карусели */
+  object-fit: cover; /* Обеспечить обрезку изображения для сохранения пропорций */
+}
+
+/* Настроки лейбла сайта */
+.label {
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 20px 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 80px auto 20px auto; /* Увеличьте верхний отступ(120px) для устранения перекрытия */
+}
+
+
+.credit-note {
+  color: #555;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+
+
+/* Настроки блока с краткой информации услуг */
+.services-overview {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.services-overview h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.service {
+  border: 1px solid #ddd; /* Граница вокруг блока услуги */
+  border-radius: 6px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #fff;
+  transition: transform 0.3s; /* Плавный переход для эффекта наведения */
+}
+
+.service h4 {
+  color: #004080;
+  margin: 0 0 10px 0;
+}
+
+.service p {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.service button {
+  background-color: #ffcc00;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer; /* Курсор pointer при наведении */
+  transition: background-color 0.3s; /* Плавный переход для цвета кнопки */
+}
+
+.service:hover {
+  transform: scale(1.03); /* Увеличение блока услуги при наведении */
+}
+
+.service button:hover {
+  background-color: #e6b800;
+}
+
+
+
+
+/* Настроки блока преимущества банка */
+.why-choose-us {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.why-choose-us h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.reason-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s; /* Плавный переход для эффекта */
+}
+
+.reason-card:hover {
+  transform: translateY(-5px); /* Подъем карточки при наведении */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Увеличение тени при наведении */
+}
+
+.reason-card h4 {
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.reason-card p {
+  color: #666;
+  margin: 0;
+}
+
+
+
+
+/* Настроки блока преимущества банка */
+.contacts-section {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #efefef;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 140px auto 100px auto;
+}
+
+.contacts-section h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px
+}
+
+.contact-info {
+  margin-bottom: 30px;
+}
+
+.contact-info h4 {
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.contact-info p {
+  color: #666;
+  margin: 5px 0;
+}
+
+.contact-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.contact-form h4 {
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+.contact-form label {
+  display: block; /* Блоковое отображение для меток */
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.contact-form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer; /* Курсор pointer при наведении */
+  transition: background-color 0.3s; /* Плавный переход для цвета кнопки */
+}
+
+.contact-form button:hover {
+  background-color: #0056b3;
+}

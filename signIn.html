@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Вход в личный кабинет | Банк</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      color: #34495e;
+    }
+
+    input {
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .error-message {
+      display: none;
+      color: #e74c3c;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Вход в личный кабинет</h1>
+    <form id="loginForm">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required placeholder="Введите email" />
+
+      <label for="password">Пароль:</label>
+      <input type="password" id="password" name="password" required placeholder="Введите пароль" />
+
+      <div id="errorMessage" class="error-message"></div>
+
+      <button type="submit">Войти</button>
+    </form>
+    <p>Нет аккаунта? <a href="registerWindow.html">Зарегистрироваться</a></p>
+  </div>
+
+ <script>
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorMessage = document.getElementById("errorMessage");
+    errorMessage.style.display = "none";
+
+    try {
+        const response = await fetch("sigInBack.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        // Проверка HTTP-статуса
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            // Опционально: сохраним данные пользователя в localStorage
+            // localStorage.setItem("user", JSON.stringify(result.user));
+
+            // Перенаправление на главную
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 100);
+        } else {
+            errorMessage.textContent = result.message || "Ошибка авторизации";
+            errorMessage.style.display = "block";
+        }
+    } catch (err) {
+        console.error("Ошибка при подключении:", err);
+        errorMessage.textContent = "Произошла ошибка при подключении к серверу";
+        errorMessage.style.display = "block";
+    }
+});
+</script>
+
+</body>
+</html>
